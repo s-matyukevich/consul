@@ -1461,7 +1461,7 @@ func (c *CAManager) SignCertificate(csr *x509.CertificateRequest, spiffeID conne
 		return nil, err
 	}
 
-	//check if the intermediate expired before using it to sign
+	// Check if the intermediate expired before using it to sign.
 	err = checkExpired(inter)
 	if err != nil {
 		return nil, err
