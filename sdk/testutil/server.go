@@ -341,7 +341,7 @@ func (s *TestServer) Stop() error {
 	select {
 	case err := <-waitDone:
 		return err
-	case <-time.After(10 * time.Second):
+	case <-time.After(20 * time.Second):
 		s.cmd.Process.Signal(syscall.SIGABRT)
 		<-waitDone
 		return fmt.Errorf("timeout waiting for server to stop gracefully")
