@@ -101,6 +101,7 @@ type TestServerConfig struct {
 	EnableScriptChecks  bool                   `json:"enable_script_checks,omitempty"`
 	Connect             map[string]interface{} `json:"connect,omitempty"`
 	EnableDebug         bool                   `json:"enable_debug,omitempty"`
+	SkipLeaveOnInt      bool                   `json:"skip_leave_on_interrupt"`
 	ReadyTimeout        time.Duration          `json:"-"`
 	Stdout              io.Writer              `json:"-"`
 	Stderr              io.Writer              `json:"-"`
@@ -323,7 +324,7 @@ func (s *TestServer) Stop() error {
 				return errors.Wrap(err, "failed to kill consul server")
 			}
 		} else { // interrupt is not supported in windows
-			if err := s.cmd.Process.Signal(syscall.SIGTERM); err != nil {
+			if err := s.cmd.Process.Signal(os.Interrupt); err != nil {
 				return errors.Wrap(err, "failed to kill consul server")
 			}
 		}
