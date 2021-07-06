@@ -103,6 +103,7 @@ type TestServerConfig struct {
 	EnableDebug         bool                   `json:"enable_debug,omitempty"`
 	SkipLeaveOnInt      bool                   `json:"skip_leave_on_interrupt"`
 	ReadyTimeout        time.Duration          `json:"-"`
+	StopTimeout         time.Duration          `json:"-"`
 	Stdout              io.Writer              `json:"-"`
 	Stderr              io.Writer              `json:"-"`
 	Args                []string               `json:"-"`
@@ -164,7 +165,9 @@ func defaultServerConfig(t TestingTB) *TestServerConfig {
 			SerfWan: ports[4],
 			Server:  ports[5],
 		},
-		ReadyTimeout: 10 * time.Second,
+		SkipLeaveOnInt: true,
+		ReadyTimeout:   10 * time.Second,
+		StopTimeout:    10 * time.Second,
 		Connect: map[string]interface{}{
 			"enabled": true,
 			"ca_config": map[string]interface{}{
@@ -341,7 +344,7 @@ func (s *TestServer) Stop() error {
 	select {
 	case err := <-waitDone:
 		return err
-	case <-time.After(20 * time.Second):
+	case <-time.After(s.Config.StopTimeout):
 		s.cmd.Process.Signal(syscall.SIGABRT)
 		<-waitDone
 		return fmt.Errorf("timeout waiting for server to stop gracefully")
